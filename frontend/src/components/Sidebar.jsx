@@ -43,7 +43,7 @@ export default function Sidebar() {
         <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
           <Sparkles size={16} className="text-white" />
         </div>
-        <span className="font-display font-bold text-lg tracking-tight">TicketFlow</span>
+        <span className="font-display font-bold text-lg tracking-tight">ResolveIQ</span>
       </div>
 
       <nav className="flex-1 px-3 space-y-1">
