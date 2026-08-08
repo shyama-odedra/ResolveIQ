@@ -1,70 +1,90 @@
-# TicketFlow AI
+# ResolveIQ
 
-An enterprise-style MERN support ticketing system with real-time updates and Gemini-powered triage — built as a placement-prep portfolio project (ServiceNow/Jira-style domain).
+### AI-Powered Enterprise Support Ticketing System
 
-## Stack
+ResolveIQ is a full-stack MERN support ticketing system designed around real-world IT service management workflows.
 
-- **Frontend:** React (Vite), Tailwind CSS, Framer Motion, Recharts, Socket.io client
-- **Backend:** Node.js, Express, MongoDB/Mongoose, JWT auth, Socket.io, Multer, Google Gemini API
+It combines secure role-based access, real-time collaboration, AI-powered ticket triage, similarity-based resolution suggestions, analytics, and an auditable activity trail into one enterprise-style application.
 
-## Setup
+Built as a placement-preparation portfolio project inspired by platforms such as ServiceNow and Jira.
 
-### 1. Backend
+---
 
-```bash
-cd backend
-cp .env.example .env
-# edit .env: set MONGO_URI, JWT_SECRET, GEMINI_API_KEY
-npm install
-npm run seed     # creates demo accounts + departments
-npm run dev       # starts on http://localhost:5000
-```
+## ✨ Features
 
-### 2. Frontend
+- 🔐 JWT-based authentication
+- 👥 Role-based access control
+- 🎫 Complete ticket lifecycle management
+- 🤖 AI-powered ticket triage with Google Gemini
+- 🔎 Similarity-based resolution suggestions
+- 💬 Real-time comments and ticket updates
+- 🔔 Real-time notifications
+- 📊 Support analytics dashboard
+- 📝 Append-only activity and audit logs
+- 📎 File attachments
+- 🏢 Department management
+- 👤 User management
+- 🛡️ Server-side workflow validation
+- ⚡ Real-time communication with Socket.io
+- 🎨 Modern responsive React interface
 
-```bash
-cd frontend
-npm install
-npm run dev       # starts on http://localhost:5173
-```
+---
 
-The Vite dev server proxies `/api` and `/uploads` to `http://localhost:5000`, so both must be running.
+## 🛠️ Tech Stack
 
-## Demo accounts (after seeding)
+### Frontend
 
-All passwords: `password123`
+- React
+- Vite
+- Tailwind CSS
+- Framer Motion
+- Recharts
+- Socket.io Client
+- Axios
 
-| Role     | Email                   |
-|----------|--------------------------|
-| Admin    | admin@ticketflow.ai     |
-| Manager  | manager@ticketflow.ai   |
-| Agent    | agent@ticketflow.ai     |
-| Employee | employee@ticketflow.ai  |
+### Backend
 
-## Architecture notes worth knowing for interviews
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- Socket.io
+- Multer
 
-- **Ticket state machine** (`open → assigned → in_progress → resolved → closed`) is enforced server-side in a Mongoose `pre('save')` hook (`backend/models/Ticket.js`), not just hidden in the UI — invalid transitions are rejected with a 400 regardless of what the client sends.
-- **Audit trail is append-only and separate** from the ticket document (`ActivityLog` model), matching how real ITSM systems track history rather than mutating a single record.
-- **AI pipeline order:** on ticket creation, a cheap MongoDB text-index similarity search runs first against resolved tickets before falling back to a live Gemini call — a cost-aware design choice, not just "call the AI every time."
-- **Real-time layer:** Socket.io rooms are per-user (`user:<id>`) for notifications and per-ticket (`ticket:<id>`) for live comments/status/activity, authenticated via JWT on the socket handshake.
-- **Role-based access** is enforced in Express middleware (`authorize(...)`), not just conditionally rendered in the frontend.
+### AI
 
-## Project structure
+- Google Gemini API
 
-```
-backend/
-  config/        MongoDB connection
-  controllers/   Route handlers (auth, tickets, comments, analytics, users, departments, notifications)
-  middleware/    JWT auth, role authorization, file upload, error handling
-  models/        User, Ticket, Comment, ActivityLog, Notification, Department
-  routes/        Express routers
-  sockets/       Socket.io init + emit helpers
-  utils/         JWT generation, Gemini service, similarity service, activity/notification helper, seed script
+---
 
-frontend/
-  src/
-    components/  Shared UI kit + ticket-specific components (cards, modals, timelines)
-    context/     Auth and Socket React contexts
-    pages/       Route-level pages
-    utils/       Axios client, formatting helpers
-```
+## 🧠 AI-Powered Ticket Triage
+
+ResolveIQ uses a cost-aware AI pipeline instead of sending every ticket directly to Gemini.
+
+When a new ticket is created:
+
+1. The system first searches previously resolved tickets using MongoDB text-index similarity.
+2. If a relevant resolved ticket is found, its resolution can be suggested.
+3. If no sufficiently similar ticket is found, the system falls back to Google Gemini.
+4. Gemini assists with intelligent ticket classification and triage.
+5. The result is integrated into the ticket workflow.
+
+This approach reduces unnecessary AI API calls while still providing intelligent assistance when required.
+
+---
+
+## 🔄 Ticket Lifecycle
+
+Tickets follow a controlled state machine:
+
+```text
+open
+  ↓
+assigned
+  ↓
+in_progress
+  ↓
+resolved
+  ↓
+closed
