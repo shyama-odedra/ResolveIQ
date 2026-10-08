@@ -1,4 +1,4 @@
-# Resolve AI
+# ResolveIQ
 
 An enterprise-style MERN support ticketing system with real-time updates and Gemini-powered triage — built as a placement-prep portfolio project (ServiceNow/Jira-style domain).
 
