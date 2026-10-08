@@ -49,17 +49,6 @@ Every ticket card and the ticket page has a Delete button (with a confirm step) 
 - Agents cannot delete tickets.
 - It is a **soft delete** (`deletedAt` / `deletedBy` on the ticket). The ticket disappears from lists, search, similar-ticket matching and analytics, but the audit log keeps a `deleted` entry. A query hook in `models/Ticket.js` hides deleted tickets everywhere, so no controller has to remember to filter them.
 
-## Demo accounts (after seeding)
-
-All passwords: `password123`
-
-| Role     | Email                   |
-|----------|--------------------------|
-| Admin    | admin@ticketflow.ai     |
-| Manager  | manager@ticketflow.ai   |
-| Agent    | agent@ticketflow.ai     |
-| Employee | employee@ticketflow.ai  |
-
 ## Architecture notes worth knowing for interviews
 
 - **Ticket state machine** (`open → assigned → in_progress → resolved → closed`) is enforced server-side in a Mongoose `pre('save')` hook (`backend/models/Ticket.js`), not just hidden in the UI — invalid transitions are rejected with a 400 regardless of what the client sends.
