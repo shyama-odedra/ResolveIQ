@@ -1,4 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const https = require("https");
+
 const { classifyPriority } = require("./priorityService");
 
 const PRIORITIES = ["critical", "high", "medium", "low"];
@@ -156,29 +158,50 @@ function buildPrompt({ title, description, category, department, similar }) {
 
 // One Gemini call. First try with a strict schema; if the model/SDK rejects the
 // schema (400), retry once in plain JSON mode with the same model.
-async function callModel(client, modelName, prompt) {
-  const attempt = async (withSchema) => {
-    const model = client.getGenerativeModel({
-      model: modelName,
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.2,
-      },
-  });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    if (!text || !text.trim()) throw new Error("Gemini returned an empty response");
-    return extractJson(text.trim());
-  };
-  try {
-    return await attempt(true);
-  } catch (err) {
-    if (String(err?.status) === "400" || /\[400|schema|Invalid JSON payload/i.test(err?.message || "")) {
-      console.warn(`[triage] ${modelName}: schema mode rejected, retrying in plain JSON mode`);
-      return attempt(false);
-    }
-    throw err;
+async function callOpenRouter(prompt) {
+  const apiKey = (process.env.OPENROUTER_API_KEY || "").trim();
+
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY is not configured");
   }
+
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-3.8-flash",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 2048,
+      response_format: {
+        type: "json_object",
+      },
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data?.error?.message || `OpenRouter request failed with status ${response.status}`
+    );
+  }
+
+  const text = data?.choices?.[0]?.message?.content;
+
+  if (!text || !text.trim()) {
+    throw new Error("OpenRouter returned an empty response");
+  }
+
+  return extractJson(text.trim());
 }
 
 function validate(parsed) {
@@ -216,7 +239,7 @@ async function analyzeTicket(title, description, options = {}) {
 
   for (const modelName of modelChain()) {
     try {
-      const parsed = await callModel(client, modelName, prompt);
+      const parsed = await callOpenRouter(prompt);
       const result = validate(parsed);
       console.log(`[triage] Gemini (${modelName}) -> ${result.priority} / ${result.category} for "${title.slice(0, 60)}"`);
       return { ...result, model: modelName, generatedAt: new Date(), source: "gemini", aiError: null };
