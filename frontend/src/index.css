@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: #f6f4ef;
+  color: #0f1b2d;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-feature-settings: "ss01";
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(15, 27, 45, 0.25);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 27, 45, 0.30);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 27, 45, 0.50);
+}
+
+/* Plain white panel used for cards, sidebar, header, dropdowns */
+.panel {
+  background: #ffffff;
+  border: 1px solid #e3ded4;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.01em;
+}
+
+/* Thin indeterminate progress bar used while AI analysis is running */
+.ai-progress {
+  position: relative;
+  overflow: hidden;
+  height: 2px;
+  background: rgba(31, 79, 209, 0.12);
+  border-radius: 2px;
+}
+.ai-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  background: #1f4fd1;
+  animation: ai-progress 1.3s ease-in-out infinite;
+}
+@keyframes ai-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Login workflow visual */
+.flow-grid {
+  background-image:
+    linear-gradient(rgba(247, 245, 240, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247, 245, 240, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+@keyframes flow-travel {
+  0% { top: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.flow-pulse {
+  animation: flow-travel 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Focus visibility for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #1f4fd1;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Skeleton loader shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(15, 27, 45, 0.06) 0%,
+    rgba(15, 27, 45, 0.12) 50%,
+    rgba(15, 27, 45, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
